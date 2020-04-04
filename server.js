@@ -11,10 +11,12 @@ const io = socketio(server);
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+const botName = 'Harmonicord Bot';
+
 // Run when client connects
 io.on('connection', (socket) => {
 	// Welcome current user
-	socket.emit('message', 'Welcome to Harmonicord!');
+	socket.emit('message', formatMessage(botName, 'Welcome to Harmonicord!'));
 
 	// Broadcast when a user connects
 	socket.broadcast.emit('message', 'A user has joined the chat');
