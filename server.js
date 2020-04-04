@@ -11,7 +11,7 @@ const io = socketio(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Run when client connects
-io.on('connection', socket => {
+io.on('connection', (socket) => {
 	// Welcome current user
 	socket.emit('message', 'Welcome to Harmonicord!');
 
@@ -21,6 +21,11 @@ io.on('connection', socket => {
 	// Runs when client disconnects
 	socket.on('disconnect', () => {
 		io.emit('message', 'A user has left the chat');
+
+		// Listen for chatMessage
+		socket.on('chatMessage', (msg) => {
+			console.log(msg);
+		});
 	});
 });
 
