@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const formatMessage = require('./utils/messages');
-const { userJoin, getCurrentUser } = require('./utils/users');
+const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require('./utils/users');
 
 const app = express();
 const server = http.createServer(app);
@@ -26,17 +26,28 @@ io.on('connection', (socket) => {
 			socket.emit('message', formatMessage(botName, 'Welcome to Harmonicord!'));
 
 			// Broadcast when a user connects
-			socket.broadcast.emit('message', formatMessage(botName, 'A user has joined the chat'));
+			socket.broadcast
+				.to(user.room)
+				.emit('message', formatMessage(botName, `${user.username} has joined the chat`));
 		};
+
+	// Listen for chatMessage
+	socket.on('chatMessage', (msg) => {
+		const user = getCurrentUser(socket.id);
+
+		io.emit('message', formatMessage('USER', msg));
+	});
 
 	// Runs when client disconnects
 	socket.on('disconnect', () => {
-		io.emit('message', formatMessage(botName, 'A user has left the chat'));
+		const user = userLeave(socket.id);
 
-		// Listen for chatMessage
-		socket.on('chatMessage', (msg) => {
-			io.emit('message', formatMessage('USER', msg));
-		});
+		if (user) {
+			io.to(user.room).emit(
+				'message',
+				formatMessage(botName, `${user.username} has left the chat`)
+			);
+		}
 	});
 });
 
