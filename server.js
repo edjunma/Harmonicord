@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const formatMessage = require('./utils/messages');
+const { userJoin, getCurrentUser } = require('./utils/users');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,11 +16,14 @@ const botName = 'Harmonicord Bot';
 
 // Run when client connects
 io.on('connection', (socket) => {
-	// Welcome current user
-	socket.emit('message', formatMessage(botName, 'Welcome to Harmonicord!'));
+	socket.on('joinRoom'),
+		({ username, room }) => {
+			// Welcome current user
+			socket.emit('message', formatMessage(botName, 'Welcome to Harmonicord!'));
 
-	// Broadcast when a user connects
-	socket.broadcast.emit('message', formatMessage(botName, 'A user has joined the chat'));
+			// Broadcast when a user connects
+			socket.broadcast.emit('message', formatMessage(botName, 'A user has joined the chat'));
+		};
 
 	// Runs when client disconnects
 	socket.on('disconnect', () => {
