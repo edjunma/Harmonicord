@@ -18,6 +18,10 @@ const botName = 'Harmonicord Bot';
 io.on('connection', (socket) => {
 	socket.on('joinRoom'),
 		({ username, room }) => {
+			const user = userJoin(socket.id, username, room);
+
+			socket.join(user.room);
+
 			// Welcome current user
 			socket.emit('message', formatMessage(botName, 'Welcome to Harmonicord!'));
 
